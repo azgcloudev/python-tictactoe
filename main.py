@@ -5,10 +5,15 @@ x_winner = ['X','X','X']
 o_winner = ['O','O','O']
 
 # Instructions
-print('In order to play the game you need to select the number where to want to put your choice: ')
-print('7 8 9')
-print('4 5 6')
-print('1 2 3')
+
+def instructions():
+    print('In order to play the game you need to select the number where to want to put your choice: ')
+    print('7|8|9')
+    print('-+-+-')
+    print('4|5|6')
+    print('-+-+-')
+    print('1|2|3')
+
 
 def display_board(glb): 
     '''glb --> game list board, function that display the current game board'''
@@ -19,7 +24,7 @@ def display_board(glb):
     print(f'{glb[0]}|{glb[1]}|{glb[2]}')
 
 # validate the winner
-def validate_winner(game):
+def validate_winner(game, player1, player2):
 
     # Validate if X win
     if game[0:3] == x_winner:
@@ -105,39 +110,102 @@ def validate_winner(game):
         else:
             return 'Player 2 win!!'
 
+
 # choose X or O for the players
+def choose_first_player(p1, p2):
+    while p1 not in ['X', 'O']:
+        print('\n')
+        p1 = input('Player 1 choose X or O:  ').upper()
 
-while player1 not in ['X', 'O']:
-    player1 = input('Player 1 do choose X or O:  ').upper()
+        if p1 not in ['X', 'O']:
+            print('Wrong choice, please choose X or O')
+        
+        if p1 == 'X':
+            p2 = 'O'
+        elif p1 == 'O':
+            p2 = 'X'
+    return p1,p2
 
-    if player1 not in ['X', 'O']:
-        print('Wrong choice, please choose X or O')
-    
-    if player1 == 'X':
-        player2 = 'O'
-    elif player1 == 'O':
-        player2 = 'X'
+#Validate if position is already played
+def validate_position(index):
+    '''Function validate if the position choose by the user is already taken'''
+    if game_list_board[index] == 'X' or game_list_board[index] == 'O':
+        print('Value already selected')
+        return True
+    else:
+        return False
 
-counter = 0
-winner = 'The game is a tie'
-while counter < 9:
-    move1 = int(input('Player 1 choose your position: ')) -1
-    game_list_board[move1] = player1
-    print(display_board(game_list_board))
-    winner = (validate_winner(game_list_board))
-    if winner == 'Player 1 win!!' or winner == 'Player 2 win!!':
-        break
-    print('\n')
-    print('\n')
+def clear_all():
+    global game_list_board
+    global player1
+    global player2
+    game_list_board = [' ',' ',' ',' ',' ',' ',' ',' ',' ']
+    player1 = ''
+    player2 = ''
+    return game_list_board, player1, player2
 
-    move2 = int(input('Player 2 choose your position: ')) -1
-    game_list_board[move2] = player2
-    print(display_board(game_list_board))
-    winner = (validate_winner(game_list_board))
-    if winner == 'Player 1 win!!' or winner == 'Player 2 win!!':
-        break
-    print('\n')
-    print('\n')
-    counter += 1
+def start_game(game_list_board, player1,player2, x_winner, o_winner):
+    keep_playing = True
+    while keep_playing:   
+        counter = 0
+        winner = 'The game is a tie'
+        
+        instructions()
+        player1, player2 = choose_first_player(player1, player2)
+        
+        while counter < 9:
+            canContinue = True
+            
+            
+            while canContinue:
+                move1 = 100
+                while move1 not in range(0,10):
+                    move1 = int(input('Player 1 choose your position: ')) -1                                         
+                    if move1 not in range(0,10):
+                        print('Value out of the game range, try again')
+                        
+                canContinue = validate_position(move1)
+                game_list_board[move1] = player1
+            display_board(game_list_board)
+            winner = (validate_winner(game_list_board, player1, player2))
+            if winner == 'Player 1 win!!' or winner == 'Player 2 win!!':
+                break
+            print('\n')
+            print('\n')
 
-print(winner)
+            canContinue = True
+            
+            while canContinue:
+                move2 = 100
+                while move2 not in range(0,10):
+                    move2 = int(input('Player 2 choose your position: ')) -1
+                    if move2 not in range(0,10):
+                        print('Value out of the game range, try again')
+                        
+                canContinue = validate_position(move2)
+                game_list_board[move2] = player2
+            display_board(game_list_board)
+            winner = (validate_winner(game_list_board, player1, player2))
+            if winner == 'Player 1 win!!' or winner == 'Player 2 win!!':
+                break
+            print('\n')
+            print('\n')
+            counter += 1
+        print(winner)
+        
+        want_to_play = 'want to play'
+        while want_to_play not in ['Y','N']:
+            want_to_play = input('Do you want to play again? Y/N: ').upper()
+            
+            if want_to_play not in ['Y','N']:
+                print('Wrong value, choose again.')
+                
+        if want_to_play == 'Y':
+                keep_playing = True
+                game_list_board, player1, player2 =  clear_all()
+                print('\n' * 100)
+        else:
+            keep_playing = False
+
+    print('Good bye!')
+start_game(game_list_board,player1, player2, x_winner, o_winner)
